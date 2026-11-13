@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulador OpenStack</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=Space+Grotesk:wght@500..700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Aviso de que é uma simulação -->
+<div class="notice-bar">Simulação didática: nenhum OpenStack real está rodando aqui. Os serviços, a ordem dos passos e as mensagens seguem o funcionamento real.</div>
+
+<!-- Barra do topo: nome do painel, velocidade e usuário logado -->
+<header class="top-bar">
+  <div class="brand">
+    <div class="brand-mark">OS</div>
+    <h1>Painel da Nuvem <small>simulação do Horizon, o painel web do OpenStack</small></h1>
+  </div>
+  <div class="session-info">
+    <label>Velocidade
+      <select id="speedSelect" class="speed-select">
+        <option value="1">Normal</option>
+        <option value="2.2" selected>Lenta (para explicar)</option>
+        <option value="0.4">Rápida</option>
+      </select>
+    </label>
+    <span id="sessionLabel">Não conectado</span>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- Menu lateral -->
+  <nav class="side-nav">
+    <div class="side-nav-label">PROJETO</div>
+    <button class="nav-button is-active" data-view="overview">Visão geral</button>
+    <button class="nav-button" data-view="instances">Instâncias (VMs)</button>
+    <div class="side-nav-label">ADMINISTRAÇÃO</div>
+    <button class="nav-button" data-view="hosts">Servidores físicos</button>
+  </nav>
+
+  <!-- Área central: preenchida pelo script.js conforme a tela escolhida -->
+  <main class="main-area" id="mainArea"></main>
+
+  <!-- Coluna "Bastidores": serviços do OpenStack e log -->
+  <aside class="backstage">
+    <div class="backstage-header">
+      <button class="log-clear" id="clearLogButton">Limpar</button>
+      <h2>Bastidores</h2>
+      <p>O que cada serviço do OpenStack está fazendo agora</p>
+    </div>
+    <div class="service-pipeline" id="servicePipeline"></div>
+    <div class="log-panel" id="logPanel"></div>
+  </aside>
+</div>
+
+<!-- Formulário de criação de instância (abre por cima da página) -->
+<div class="modal-backdrop" id="createModal">
+  <form class="modal" id="createForm">
+    <h2>Criar instância</h2>
+    <p class="modal-subtitle">Escolha o que a máquina virtual vai ter. É o mesmo formulário do painel real, simplificado.</p>
+
+    <div class="form-field">
+      <label for="instanceNameInput">Nome da instância</label>
+      <input type="text" id="instanceNameInput" placeholder="ex.: servidor-api" autocomplete="off">
+      <div class="form-error" id="nameError">Use só letras minúsculas, números e hífen, sem repetir um nome que já existe.</div>
+    </div>
+
+    <div class="form-field">
+      <label>Imagem <small>(sistema operacional, guardado pelo Glance)</small></label>
+      <div class="option-grid" id="imageOptions"></div>
+    </div>
+
+    <div class="form-field">
+      <label>Flavor <small>(tamanho da máquina: CPU, memória e disco)</small></label>
+      <div class="option-grid" id="flavorOptions"></div>
+    </div>
+
+    <div class="form-field">
+      <label for="networkSelect">Rede <small>(criada pelo Neutron)</small></label>
+      <select id="networkSelect">
+        <option value="rede-interna">rede-interna (10.0.0.0/24)</option>
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label class="checkbox-row"><input type="checkbox" id="volumeCheckbox"> Adicionar disco extra de 10 GB <small>(volume do Cinder)</small></label>
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="secondary-button" id="cancelCreateButton">Cancelar</button>
+      <button type="submit" class="primary-button">Criar instância</button>
+    </div>
+  </form>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Carregado no fim para que todos os elementos acima já existam -->
+<script src="script.js"></script>
+</body>
+</html>
