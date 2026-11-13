@@ -42,7 +42,7 @@ const serviceLogColors = {
 
 // Cota do projeto: o limite que o administrador da nuvem define para cada
 // equipe. No OpenStack real isso é configurado por projeto no Nova/Keystone.
-const projectQuota = { maximumInstances: 10, maximumVirtualCpus: 20, maximumMemoryMegabytes: 51200 };
+const projectQuota = { maximumInstances: 15, maximumVirtualCpus: 40, maximumMemoryMegabytes: 81920 };
 
 // ============================================================
 // ESTADO DA SIMULAÇÃO
@@ -61,9 +61,9 @@ const simulationState = {
   selectedImageId: 'cirros',
   selectedFlavorId: 'm1.tiny',
   computeHosts: [
-    { hostName: 'compute-01', totalVirtualCpus: 8, totalMemoryMegabytes: 16384 },
-    { hostName: 'compute-02', totalVirtualCpus: 8, totalMemoryMegabytes: 16384 },
-    { hostName: 'compute-03', totalVirtualCpus: 4, totalMemoryMegabytes: 8192 }
+    { hostName: 'compute-01', totalVirtualCpus: 4, totalMemoryMegabytes: 8192 },
+    { hostName: 'compute-02', totalVirtualCpus: 4, totalMemoryMegabytes: 8192 },
+    { hostName: 'compute-03', totalVirtualCpus: 2, totalMemoryMegabytes: 4096 }
   ],
   instances: [
     { instanceName: 'servidor-web', imageName: 'Ubuntu 24.04', flavorId: 'm1.medium', ipAddress: '10.0.0.10', hostName: 'compute-01', status: 'active', hasExtraVolume: false }
