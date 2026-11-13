@@ -264,22 +264,20 @@ function renderInstances() {
   const instanceRows = simulationState.instances.map(instance => `
     <tr>
       <td><b>${escapeHtml(instance.instanceName)}</b></td>
-      <td>${instance.imageName}</td>
-      <td class="mono">${instance.flavorId}</td>
-      <td class="mono">${instance.ipAddress || '...'}</td>
-      <td class="mono">${instance.hostName || '...'}</td>
+      <td>${instance.imageName}<span class="cell-detail mono">${instance.flavorId}</span></td>
+      <td class="mono">${instance.ipAddress || '...'}<span class="cell-detail">${instance.hostName || 'aguardando scheduler'}</span></td>
       <td>${renderInstanceStatus(instance.status)}</td>
-      <td><button class="danger-button" data-delete="${escapeHtml(instance.instanceName)}" ${instance.status !== 'active' || simulationState.isOperationRunning ? 'disabled' : ''}>Excluir</button></td>
+      <td class="cell-action"><button class="danger-button" data-delete="${escapeHtml(instance.instanceName)}" ${instance.status !== 'active' || simulationState.isOperationRunning ? 'disabled' : ''}>Excluir</button></td>
     </tr>`).join('');
   mainArea.innerHTML = `
     <div class="page-header">
       <div><h2>Instâncias</h2><p>Máquinas virtuais do projeto turma-a</p></div>
       <button class="primary-button" id="openCreateFromInstances" ${simulationState.isOperationRunning ? 'disabled' : ''}>+ Criar instância</button>
     </div>
-    <div class="card" style="padding:8px 10px">
+      <div class="card table-card">
       <table>
-        <tr><th>Nome</th><th>Imagem</th><th>Flavor</th><th>IP</th><th>Servidor físico</th><th>Status</th><th></th></tr>
-        ${instanceRows || '<tr><td colspan="7" class="empty-row">Nenhuma instância. Crie a primeira!</td></tr>'}
+        <tr><th>Nome</th><th>Imagem / Flavor</th><th>IP / Servidor físico</th><th>Status</th><th></th></tr>
+        ${instanceRows || '<tr><td colspan="5" class="empty-row">Nenhuma instância. Crie a primeira!</td></tr>'}
       </table>
     </div>`;
   document.getElementById('openCreateFromInstances').addEventListener('click', openCreateModal);
