@@ -21,7 +21,7 @@ No topo da página há um seletor de velocidade. O modo "Lenta" é o melhor para
 
 Não precisa instalar nada. Há duas opções:
 
-- **Online:** abra o link publicado na Vercel.
+- **Online:** [openstack-simulator-vcd7.vercel.app](https://openstack-simulator-vcd7.vercel.app)
 - **Local:** baixe a pasta do projeto e abra o `index.html` com dois cliques. Os três arquivos precisam ficar na mesma pasta. Funciona sem internet; nesse caso só as fontes mudam para as padrão do sistema.
 
 ## Tecnologias
