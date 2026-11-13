@@ -222,10 +222,10 @@ async function performLogin() {
   resetPipeline();
   await runServiceStep('horizon', 'Enviando credenciais do usuário "aluno"', 'O painel repassa o login para o serviço de identidade.', 700);
   await runServiceStep('keystone', 'POST /v3/auth/tokens → 201 Created', 'Senha conferida. O Keystone emite um token, um "crachá" temporário.', 1100);
-  writeLog('keystone', 'Token válido por 1h · projeto: turma-a · papel: member', 'Todo pedido daqui pra frente leva esse token junto.');
+  writeLog('keystone', 'Token válido por 1h, projeto turma-a, papel member', 'Todo pedido daqui pra frente leva esse token junto.');
   simulationState.isLoggedIn = true;
   simulationState.isOperationRunning = false;
-  document.getElementById('sessionLabel').textContent = 'aluno · projeto turma-a';
+  document.getElementById('sessionLabel').textContent = 'Usuário: aluno | Projeto: turma-a';
   showToast('Conectado. O Keystone emitiu o token.');
   renderCurrentView();
 }
@@ -274,7 +274,7 @@ function renderInstances() {
       <div><h2>Instâncias</h2><p>Máquinas virtuais do projeto turma-a</p></div>
       <button class="primary-button" id="openCreateFromInstances" ${simulationState.isOperationRunning ? 'disabled' : ''}>+ Criar instância</button>
     </div>
-      <div class="card table-card">
+    <div class="card table-card">
       <table>
         <tr><th>Nome</th><th>Imagem / Flavor</th><th>IP / Servidor físico</th><th>Status</th><th></th></tr>
         ${instanceRows || '<tr><td colspan="5" class="empty-row">Nenhuma instância. Crie a primeira!</td></tr>'}
@@ -331,11 +331,11 @@ function renderCurrentView() {
 
 function renderOptionCards() {
   document.getElementById('imageOptions').innerHTML = availableImages.map(image =>
-    '<button type="button" class="option-card' + (image.imageId === simulationState.selectedImageId ? ' is-selected' : '') + '" data-image="' + image.imageId + '"><strong>' + image.displayName + '</strong><span>' + image.sizeLabel + ' · ' + image.note + '</span></button>'
+    '<button type="button" class="option-card' + (image.imageId === simulationState.selectedImageId ? ' is-selected' : '') + '" data-image="' + image.imageId + '"><strong>' + image.displayName + '</strong><span>' + image.sizeLabel + ' - ' + image.note + '</span></button>'
   ).join('');
   document.getElementById('flavorOptions').style.gridTemplateColumns = 'repeat(4, 1fr)';
   document.getElementById('flavorOptions').innerHTML = availableFlavors.map(flavor =>
-    '<button type="button" class="option-card' + (flavor.flavorId === simulationState.selectedFlavorId ? ' is-selected' : '') + '" data-flavor="' + flavor.flavorId + '"><strong>' + flavor.flavorId + '</strong><span>' + flavor.virtualCpus + ' vCPU · ' + formatMemory(flavor.memoryMegabytes) + '</span></button>'
+    '<button type="button" class="option-card' + (flavor.flavorId === simulationState.selectedFlavorId ? ' is-selected' : '') + '" data-flavor="' + flavor.flavorId + '"><strong>' + flavor.flavorId + '</strong><span>' + flavor.virtualCpus + ' vCPU, ' + formatMemory(flavor.memoryMegabytes) + '</span></button>'
   ).join('');
   document.querySelectorAll('[data-image]').forEach(imageButton => imageButton.addEventListener('click', () => {
     simulationState.selectedImageId = imageButton.dataset.image; renderOptionCards();
@@ -396,7 +396,7 @@ async function createInstance(instanceName, chosenImage, chosenFlavor, wantsExtr
   const startTimestamp = Date.now();
 
   await runServiceStep('horizon', 'Pedido: criar "' + instanceName + '" (' + chosenImage.displayName + ', ' + chosenFlavor.flavorId + ')', 'O painel transforma o formulário numa chamada de API.', 700);
-  await runServiceStep('keystone', 'Token conferido · usuário aluno · projeto turma-a', 'Antes de fazer qualquer coisa, o OpenStack confere quem está pedindo.', 800);
+  await runServiceStep('keystone', 'Token conferido: usuário aluno, projeto turma-a', 'Antes de fazer qualquer coisa, o OpenStack confere quem está pedindo.', 800);
 
   // Antes de criar, o Nova confere se o projeto ainda está dentro da cota.
   const projectUsage = calculateProjectUsage();
@@ -419,7 +419,7 @@ async function createInstance(instanceName, chosenImage, chosenFlavor, wantsExtr
   simulationState.instances.push(newInstance);
   simulationState.currentView = 'instances';
   renderCurrentView();
-  await runServiceStep('nova', 'nova-api: POST /v2.1/servers → 202 Accepted · status BUILD', 'Pedido aceito. A VM entra na fila como "Construindo".', 900);
+  await runServiceStep('nova', 'nova-api: POST /v2.1/servers → 202 Accepted (status BUILD)', 'Pedido aceito. A VM entra na fila como "Construindo".', 900);
 
   setServiceState('nova', 'is-working');
   // O scheduler decide em qual servidor físico a VM vai rodar.
@@ -445,11 +445,11 @@ async function createInstance(instanceName, chosenImage, chosenFlavor, wantsExtr
 
   // A ordem de criar a VM chega ao servidor escolhido por fila de mensagens.
   await runServiceStep('rabbitmq', 'nova-conductor → ' + schedulerResult.chosenHost.hostName + ': build_and_run_instance', 'A ordem vai por fila de mensagens até o nova-compute do servidor escolhido.', 900);
-  await runServiceStep('glance', 'GET /v2/images/' + chosenImage.imageId + '/file · ' + chosenImage.sizeLabel, 'O servidor físico baixa a imagem do sistema operacional.', 1000);
+  await runServiceStep('glance', 'GET /v2/images/' + chosenImage.imageId + '/file (' + chosenImage.sizeLabel + ')', 'O servidor físico baixa a imagem do sistema operacional.', 1000);
 
   const assignedIpAddress = '10.0.0.' + simulationState.nextIpSuffix;
   simulationState.nextIpSuffix += 1;
-  await runServiceStep('neutron', 'Porta criada em rede-interna · IP ' + assignedIpAddress, 'A VM ganha uma placa de rede virtual e um endereço.', 900);
+  await runServiceStep('neutron', 'Porta criada em rede-interna, IP ' + assignedIpAddress, 'A VM ganha uma placa de rede virtual e um endereço.', 900);
   newInstance.ipAddress = assignedIpAddress;
   renderCurrentView();
 
@@ -480,7 +480,7 @@ async function deleteInstance(instanceName) {
   await runServiceStep('keystone', 'Token conferido', null, 500);
   await runServiceStep('nova', 'DELETE /v2.1/servers/' + instanceName + ' → 204', 'O Nova manda desligar e apagar a VM.', 700);
   await runServiceStep('kvm', 'libvirt: domínio "' + instanceName + '" destruído em ' + instanceToDelete.hostName, null, 700);
-  await runServiceStep('neutron', 'Porta removida · IP ' + instanceToDelete.ipAddress + ' liberado', null, 600);
+  await runServiceStep('neutron', 'Porta removida, IP ' + instanceToDelete.ipAddress + ' liberado', null, 600);
   if (instanceToDelete.hasExtraVolume) {
     writeLog('cinder', 'Volume desanexado (continua disponível)', 'O disco extra não some junto com a VM.');
   }
